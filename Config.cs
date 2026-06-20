@@ -22,7 +22,7 @@ namespace IRCrarria
 
         public Config(string configText)
         {
-            var document = Tomlyn.ToModel(configText);
+            var document = Toml.ToModel(configText);
             var hosttable = (TomlTable)document["host"];
             Hostname = (string)hosttable["hostname"];
             Port = (int)(long)hosttable["port"];
