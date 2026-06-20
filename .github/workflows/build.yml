@@ -25,8 +25,10 @@ jobs:
           unzip -q tshock.zip -d tshock_extract || true
           find tshock_extract -type f \( -iname "*.dll" -o -iname "*.exe" \) -exec cp {} lib/ \;
           cd lib
-          # TShock 6.x renamed TShockAPI.dll → TShock.dll; keep both names so the compiler finds it
-          [ -f TShock.dll ] && [ ! -f TShockAPI.dll ] && cp TShock.dll TShockAPI.dll
+          # TShock 6.x: TSAPI.dll is the new name for TerrariaApi.Server.dll
+          [ -f TSAPI.dll ] && [ ! -f TerrariaApi.Server.dll ] && cp TSAPI.dll TerrariaApi.Server.dll
+          # TShock 6.x: TShock.Server.exe is the launcher; keep TerrariaServer.exe alias if needed
+          [ ! -f TerrariaServer.exe ] && [ -f TShock.Server.exe ] && cp TShock.Server.exe TerrariaServer.exe
           ls -la
 
       - run: dotnet restore
