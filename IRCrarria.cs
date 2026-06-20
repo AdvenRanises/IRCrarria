@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -51,10 +52,10 @@ namespace IRCrarria
 
         public override void Initialize()
         {
-            ServerApi.Hooks.ServerJoin += OnJoin;
-            ServerApi.Hooks.ServerLeave += OnLeave;
-            ServerApi.Hooks.ServerBroadcast += OnBroadcast;
-            ServerApi.Hooks.GamePostInitialize += OnPostInitialize;
+            ServerApi.Hooks.ServerJoin.Register(this, OnJoin);
+            ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
+            ServerApi.Hooks.ServerBroadcast.Register(this, OnBroadcast);
+            ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
             PlayerHooks.PlayerChat += OnChat;
         }
 
@@ -62,10 +63,10 @@ namespace IRCrarria
         {
             if (disposing)
             {
-                ServerApi.Hooks.ServerJoin -= OnJoin;
-                ServerApi.Hooks.ServerLeave -= OnLeave;
-                ServerApi.Hooks.ServerBroadcast -= OnBroadcast;
-                ServerApi.Hooks.GamePostInitialize -= OnPostInitialize;
+                ServerApi.Hooks.ServerJoin.Deregister(this, OnJoin);
+                ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
+                ServerApi.Hooks.ServerBroadcast.Deregister(this, OnBroadcast);
+                ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInitialize);
                 PlayerHooks.PlayerChat -= OnChat;
 
                 if (_irc != null)
