@@ -19,16 +19,15 @@ jobs:
 
       - name: Download TShock 6.1.0
         run: |
-          mkdir -p lib tshock_extract
+          mkdir -p libs tshock_extract
           URL="https://github.com/Pryaxis/TShock/releases/download/v6.1.0/TShock-6.1.0-for-Terraria-1.4.5.6-win-x64-Release.zip"
           curl -L --fail -o tshock.zip "$URL" || curl -L --fail -o tshock.zip "https://github.com/Pryaxis/TShock/releases/download/v6.1.0/TShock-6.1.0-for-Terraria-1.4.5.6-linux-x64-Release.zip"
           unzip -q tshock.zip -d tshock_extract || true
-          find tshock_extract -type f \( -iname "*.dll" -o -iname "*.exe" \) -exec cp {} lib/ \;
-          cd lib
-          # TShock 6.x: TSAPI.dll is the new name for TerrariaApi.Server.dll
+          find tshock_extract -type f \( -iname "*.dll" -o -iname "*.exe" \) -exec cp {} libs/ \;
+          cd libs
           [ -f TSAPI.dll ] && [ ! -f TerrariaApi.Server.dll ] && cp TSAPI.dll TerrariaApi.Server.dll
-          # TShock 6.x: TShock.Server.exe is the launcher; keep TerrariaServer.exe alias if needed
           [ ! -f TerrariaServer.exe ] && [ -f TShock.Server.exe ] && cp TShock.Server.exe TerrariaServer.exe
+          [ -f TShock.dll ] && [ ! -f TShockAPI.dll ] && cp TShock.dll TShockAPI.dll
           ls -la
 
       - run: dotnet restore
