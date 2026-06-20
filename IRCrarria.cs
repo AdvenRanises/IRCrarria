@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
@@ -47,7 +50,6 @@ namespace IRCrarria
 
         public override void Initialize()
         {
-            // OTAPI 3 / TShock 6: static events instead of .Register(this, ...)
             ServerApi.Hooks.ServerJoin += OnJoin;
             ServerApi.Hooks.ServerLeave += OnLeave;
             ServerApi.Hooks.ServerBroadcast += OnBroadcast;
@@ -61,7 +63,7 @@ namespace IRCrarria
             {
                 ServerApi.Hooks.ServerJoin -= OnJoin;
                 ServerApi.Hooks.ServerLeave -= OnLeave;
-                ServerApi.Hooks.ServerBroadcast -= OnBroadcast;  // BUGFIX: was Register in original
+                ServerApi.Hooks.ServerBroadcast -= OnBroadcast;
                 ServerApi.Hooks.GamePostInitialize -= OnPostInitialize;
                 PlayerHooks.PlayerChat -= OnChat;
 
@@ -124,10 +126,10 @@ namespace IRCrarria
 
         private void OnIrcWelcome(IrcClient bot)
         {
-            bot.SetSelfMode("+B"); // inspircd bot, doesn't receive history
+            bot.SetSelfMode("+B");
             if (_cfg.ConnectCommands != null)
                 foreach (var command in _cfg.ConnectCommands)
-                       bot.ExecuteRaw(command);
+                    bot.ExecuteRaw(command);
 
             bot.JoinChannel(_cfg.Channel);
         }
@@ -146,7 +148,7 @@ namespace IRCrarria
                 : $"[c/CE1F6A:IRC] [c/FF9A8C:{user} has left {channel}.]";
             TShock.Utils.Broadcast(msg, Color.White);
         }
-        
+
         private static void OnIrcQuit(IrcClient _, string user, string? reason)
         {
             var msg = reason != null
@@ -159,7 +161,7 @@ namespace IRCrarria
         {
             TShock.Utils.Broadcast($"[c/CE1F6A:IRC] [c/28FFBF:{user} joined {channel}]", Color.White);
         }
-        
+
         private bool ExecuteCommand(string text)
         {
             if (_irc == null) return false;
@@ -177,7 +179,7 @@ namespace IRCrarria
                         foreach (var detail in _cfg.ExtraDetails)
                         {
                             if (detail.Value is string value)
-                                   _irc.SendMessage(_cfg.Channel, $"{detail.Key}: {value}");
+                                _irc.SendMessage(_cfg.Channel, $"{detail.Key}: {value}");
                         }
                     }
                     var elapsed = DateTime.Now.Subtract(StartTime);
