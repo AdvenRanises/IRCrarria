@@ -1,28 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <AssemblyVersion>1.4.0.0</AssemblyVersion>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>IRCrarria</AssemblyName>
+    <RootNamespace>IRCrarria</RootNamespace>
+    <Version>1.4.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Tomlyn" Version="0.17.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Tomlyn" Version="0.17.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="OTAPI">
-        <HintPath>lib\OTAPI.dll</HintPath>
-      </Reference>
-      <Reference Include="TerrariaServer">
-        <HintPath>lib\TerrariaServer.dll</HintPath>
-      </Reference>
-      <!-- TShock 6.x renamed TShockAPI.dll → TShock.dll -->
-      <Reference Include="TShock">
-        <HintPath>lib\TShock.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+  <ItemGroup>
+    <Reference Include="OTAPI">
+      <HintPath>libs\OTAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TerrariaApi.Server" Condition="Exists('libs\TerrariaApi.Server.dll')">
+      <HintPath>libs\TerrariaApi.Server.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TSAPI" Condition="Exists('libs\TSAPI.dll')">
+      <HintPath>libs\TSAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TerrariaServer" Condition="Exists('libs\TerrariaServer.exe')">
+      <HintPath>libs\TerrariaServer.exe</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TShock.Server" Condition="Exists('libs\TShock.Server.dll')">
+      <HintPath>libs\TShock.Server.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TShockAPI" Condition="Exists('libs\TShockAPI.dll')">
+      <HintPath>libs\TShockAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
 
 </Project>
