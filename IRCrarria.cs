@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
@@ -47,10 +47,11 @@ namespace IRCrarria
 
         public override void Initialize()
         {
-            ServerApi.Hooks.ServerJoin.Register(this, OnJoin);
-            ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
-            ServerApi.Hooks.ServerBroadcast.Register(this, OnBroadcast);
-            ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
+            // OTAPI 3 / TShock 6: static events instead of .Register(this, ...)
+            ServerApi.Hooks.ServerJoin += OnJoin;
+            ServerApi.Hooks.ServerLeave += OnLeave;
+            ServerApi.Hooks.ServerBroadcast += OnBroadcast;
+            ServerApi.Hooks.GamePostInitialize += OnPostInitialize;
             PlayerHooks.PlayerChat += OnChat;
         }
 
@@ -58,11 +59,12 @@ namespace IRCrarria
         {
             if (disposing)
             {
-                ServerApi.Hooks.ServerJoin.Deregister(this, OnJoin);
-                ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
-                ServerApi.Hooks.ServerBroadcast.Register(this, OnBroadcast);
-                ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInitialize);
+                ServerApi.Hooks.ServerJoin -= OnJoin;
+                ServerApi.Hooks.ServerLeave -= OnLeave;
+                ServerApi.Hooks.ServerBroadcast -= OnBroadcast;  // BUGFIX: was Register in original
+                ServerApi.Hooks.GamePostInitialize -= OnPostInitialize;
                 PlayerHooks.PlayerChat -= OnChat;
+
                 if (_irc != null)
                 {
                     _irc.Welcome -= OnIrcWelcome;
@@ -125,7 +127,7 @@ namespace IRCrarria
             bot.SetSelfMode("+B"); // inspircd bot, doesn't receive history
             if (_cfg.ConnectCommands != null)
                 foreach (var command in _cfg.ConnectCommands)
-                    bot.ExecuteRaw(command);
+                       bot.ExecuteRaw(command);
 
             bot.JoinChannel(_cfg.Channel);
         }
@@ -175,7 +177,7 @@ namespace IRCrarria
                         foreach (var detail in _cfg.ExtraDetails)
                         {
                             if (detail.Value is string value)
-                                _irc.SendMessage(_cfg.Channel, $"{detail.Key}: {value}");
+                                   _irc.SendMessage(_cfg.Channel, $"{detail.Key}: {value}");
                         }
                     }
                     var elapsed = DateTime.Now.Subtract(StartTime);
