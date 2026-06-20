@@ -1,10 +1,11 @@
-name: Build
+name: Build IRCrarria
 
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,37 +13,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      # Download TShock 6.1.0 release and extract reference DLLs
-      - name: Setup TShock dependencies
+      - name: Download TShock 6.1.0
         run: |
-          mkdir -p lib
-          # If the asset name below is wrong, grab the correct one from:
-          # https://github.com/Pryaxis/TShock/releases/tag/v6.1.0
-          curl -L -o tshock.zip \
-            https://github.com/Pryaxis/TShock/releases/download/v6.1.0/TShock-6.1.0-for-Terraria-1.4.5.6.zip
-          unzip -o tshock.zip -d tshock_tmp
-          # Copy required DLLs (handles both old TShockAPI.dll and new TShock.dll)
-          find tshock_tmp -name "OTAPI.dll"        -exec cp {} lib/ \;
-          find tshock_tmp -name "TerrariaServer.dll" -exec cp {} lib/ \;
-          find tshock_tmp -name "TShock.dll"     -exec cp {} lib/ \; || true
-          find tshock_tmp -name "TShockAPI.dll"  -exec cp {} lib/ \; || true
-          rm -rf tshock_tmp tshock.zip
+          mkdir -p lib tshock_extract
+          URL="https://github.com/Pryaxis/TShock/releases/download/v6.1.0/TShock-6.1.0-for-Terraria-1.4.5.6-win-x64-Release.zip"
+          curl -L --fail -o tshock.zip "$URL" || curl -L --fail -o tshock.zip "https://github.com/Pryaxis/TShock/releases/download/v6.1.0/TShock-6.1.0-for-Terraria-1.4.5.6-linux-x64-Release.zip"
+          unzip -q tshock.zip -d tshock_extract || true
+          find tshock_extract -type f \( -iname "*.dll" -o -iname "*.exe" \) -exec cp {} lib/ \;
+          cd lib
+          # TShock 6.x renamed TShockAPI.dll → TShock.dll; keep both names so the compiler finds it
+          [ -f TShock.dll ] && [ ! -f TShockAPI.dll ] && cp TShock.dll TShockAPI.dll
+          ls -la
 
-      - name: Restore
-        run: dotnet restore
+      - run: dotnet restore
 
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      - run: dotnet build --configuration Release --no-restore
 
-      - name: Upload Plugin
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: IRCrarria
-          path: |
-            bin/Release/net9.0/IRCrarria.dll
-            bin/Release/net9.0/Tomlyn.dll
+          path: bin/Release/net9.0/IRCrarria.dll
