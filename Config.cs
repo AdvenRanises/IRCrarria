@@ -1,38 +1,42 @@
-namespace IRCrarria
-
-using System
+using System;
 using System.Collections.Generic;
-using System.Linq
-using Tomlyn
-using Tomlyn.Model
+using System.Linq;
+using Tomlyn;
+using Tomlyn.Model;
 
-type Config(configText: string) =
-    // Parse the document immediately on instantiation
-    let document = Toml.ToModel(configText)
-    let hostTable = document["host"] :?> TomlTable
-    let ircTable = document["irc"] :?> TomlTable
+namespace IRCrarria
+{
+    public class Config
+    {
+        public string Hostname { get; }
+        public int Port { get; }
+        public bool UseSsl { get; }
+        public bool SkipCertValidation { get; }
+        public bool IrcLog { get; }
+        public string Username { get; }
+        public string Nickname { get; }
+        public string Channel { get; }
+        public string Prefix { get; }
+        public IEnumerable<KeyValuePair<string, object>>? ExtraDetails { get; }
+        public IEnumerable<string>? ConnectCommands { get; }
 
-    // Expose read-only properties automatically
-    member _.Hostname : string = hostTable["hostname"] :?> string
-    member _.Port : int = int(hostTable["port"] :?> int64)
-    member _.UseSsl : bool = hostTable["ssl"] :?> bool
-    member _.SkipCertValidation : bool = hostTable["skip_cert_validation"] :?> bool
-    member _.IrcLog : bool = hostTable["irc_log"] :?> bool
-    
-    member _.Username : string = ircTable["username"] :?> string
-    member _.Nickname : string = ircTable["nickname"] :?> string
-    member _.Channel : string = ircTable["channel"] :?> string
-    member _.Prefix : string = ircTable["prefix"] :?> string
-
-    // Handle optional fields safely using F# Options converted to Nullable/IEnumerable
-    member _.ExtraDetails : IEnumerable<KeyValuePair<string, obj>> =
-        if document.ContainsKey("server_details") then 
-            document["server_details"] :?> TomlTable :> IEnumerable<KeyValuePair<string, obj>>
-        else 
-            null
-
-    member _.ConnectCommands : IEnumerable<string> =
-        if ircTable.ContainsKey("connect_commands") then
-            (ircTable["connect_commands"] :?> TomlArray).OfType<string>()
-        else 
-            null
+        public Config(string configText)
+        {
+            var document = Toml.ToModel(configText);
+            var hosttable = (TomlTable)document["host"];
+            Hostname = (string)hosttable["hostname"];
+            Port = (int)(long)hosttable["port"];
+            UseSsl = (bool)hosttable["ssl"];
+            SkipCertValidation = (bool)hosttable["skip_cert_validation"];
+            IrcLog = (bool)hosttable["irc_log"];
+            var irctable = (TomlTable)document["irc"];
+            Username = (string)irctable["username"];
+            Nickname = (string)irctable["nickname"];
+            Channel = (string)irctable["channel"];
+            Prefix = (string)irctable["prefix"];
+            if (document.ContainsKey("server_details")) ExtraDetails = (TomlTable)document["server_details"];
+            if (irctable.ContainsKey("connect_commands"))
+                ConnectCommands = ((TomlArray)irctable["connect_commands"]).OfType<string>();
+        }
+    }
+}
