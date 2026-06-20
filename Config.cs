@@ -1,4 +1,6 @@
-﻿using Tomlyn;
+using System;
+using System.Collections.Generic;
+using Tomlyn;
 using Tomlyn.Model;
 
 namespace IRCrarria
@@ -22,7 +24,7 @@ namespace IRCrarria
             var document = Toml.ToModel(configText);
             var hosttable = (TomlTable)document["host"];
             Hostname = (string)hosttable["hostname"];
-            Port = (int)(long)hosttable["port"]; // yes, this cast is required
+            Port = (int)(long)hosttable["port"];
             UseSsl = (bool)hosttable["ssl"];
             SkipCertValidation = (bool)hosttable["skip_cert_validation"];
             IrcLog = (bool)hosttable["irc_log"];
