@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tomlyn;
 using Tomlyn.Model;
 
@@ -21,7 +22,7 @@ namespace IRCrarria
 
         public Config(string configText)
         {
-            var document = Toml.ToModel(configText);
+            var document = Tomlyn.ToModel(configText);
             var hosttable = (TomlTable)document["host"];
             Hostname = (string)hosttable["hostname"];
             Port = (int)(long)hosttable["port"];
