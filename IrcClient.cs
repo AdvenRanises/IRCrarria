@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+using System;
+using System.Globalization;
+using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
@@ -31,7 +33,7 @@ namespace IRCrarria
                 lock (_writeLock)
                 {
                     _stream.Write(Encoding.UTF8.GetBytes(input));
-                    _stream.Write(new byte[]{0x0d, 0x0a}); // crlf
+                    _stream.Write(new byte[]{0x0d, 0x0a});
                 }
             }
 
@@ -216,7 +218,7 @@ namespace IRCrarria
             var sepIndex = prefix.IndexOf('!');
             return sepIndex == -1 ? prefix : prefix[..sepIndex];
         }
-        
+       
         public void Start()
         {
             lock (_stateLock)
